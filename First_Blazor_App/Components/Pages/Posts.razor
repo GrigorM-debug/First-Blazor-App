@@ -1,0 +1,60 @@
+﻿@attribute [StreamRendering]
+@inject HttpClient HttpClient
+@page "/posts"
+@using BlazorBootstrap
+
+<PageTitle>Posts</PageTitle>
+<h3>Posts</h3>
+
+<p>This component demonstrates fetching and displaying a list of posts.</p>
+
+@if (posts == null)
+{
+    <p><em>Loading...</em></p>
+} 
+else if (Error != null)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @Error
+    </div>
+}
+else
+{
+        @foreach (var post in posts)
+        {
+            <Card Class="mb-4" Style="width:18rem;">
+                <CardBody>
+                    <CardTitle>@post.Title</CardTitle>
+                    <CardText>@post.Body</CardText>
+                </CardBody>
+            </Card>
+        }
+}
+
+@code {
+    private Post[] posts;
+    private string Error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Simulate asynchronous loading to demonstrate streaming rendering
+            await Task.Delay(500);
+            // Fetch photos from a hypothetical API endpoint
+            posts = await HttpClient.GetFromJsonAsync<Post[]>("https://jsonplaceholder.typicode.com/photos");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching photos: {ex.Message}");
+            Error = "Failed to load photos.";
+        }
+    }
+
+    private class Post
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+    }
+}
